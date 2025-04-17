@@ -85,12 +85,35 @@ def trouver_toutes_racines(coefficients, valeurs_initiales):
     
     return racines
 
-def distance_signee(lambda_, x_0,y_0,a,b):
-    x = x_0/(1-lambda_/(a**2))
-    y= y_0/(1-lambda_/(b**2))
-    d = np.sqrt((x-x_0)**2+(y-y_0)**2)
-    print(f"Distance signée: {np.sign((x_0/a)**2 + (y_0/b)**2 -1)*d:.10f}")
-    return x,y,np.sign((x_0/a)**2 + (y_0/b)**2 -1)*d
+def distance_signee(listes_racines, x_0,y_0,a,b):
+    """
+    Calcule la distance signée entre un point (x_0, y_0) et l'ellipse de paramètres a et b
+    
+    Args:
+        listes_racines: Liste des racines trouvées
+        x_0: Coordonnée x du point M_0
+        y_0: Coordonnée y du point M_0
+        a: Longueur du demi-grand axe de l'ellipse
+        b: Longueur du demi-petit axe de l'ellipse
+    """
+    d = []
+    list_x = []
+    list_y = []
+    # Exploration de tous les candidats possibles
+    for lambda_ in listes_racines :
+        x= x_0/(1-lambda_/(a**2))
+        y = y_0/(1-lambda_/(b**2))
+        d.append(np.sqrt((x-x_0)**2+(y-y_0)**2))
+        list_x.append(x)
+        list_y.append(y)
+    # On ne garde que le candidat réalisant la distance minimale
+    min_d = min(d)
+    index_min = d.index(min_d)
+
+    print(f'Point réalisant la distance signée minimale:{list_x[index_min], list_y[index_min]}' )
+    print(f"Distance signée: {np.sign((x_0/a)**2 + (y_0/b)**2 -1)*min_d:.10f}")
+
+    return list_x[index_min], list_y[index_min],np.sign((x_0/a)**2 + (y_0/b)**2 -1)*min_d
 
 
 ######################################################## PLOTS #######################################################
@@ -188,6 +211,6 @@ if __name__ == "__main__":
         print(f"f(x) = {fonction_polynomiale(racine, coeffs):.15f}")
         plt.plot(racine, 0, 'go', markersize=8)
     plt.savefig('./polynome.png')
-    
-    x,y,d= distance_signee(racines[0][0], x_0, y_0, a, b)
+
+    x,y,d= distance_signee(racines[0], x_0, y_0, a, b)
     tracer_ellipse_et_points(a, b,points=[(x_0, y_0), (x, y)])
